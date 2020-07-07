@@ -2,8 +2,6 @@ import React from 'react';
 
 import 'components/Button.scss';
 
-//Source: https://github.com/JedWatson/classnames#usage
-// Alternate bind version for css-modules
 import classNames from 'classnames/bind';
 
 export default function Button(props) {
