@@ -5,12 +5,23 @@ import { action } from '@storybook/addon-actions';
 
 import 'index.scss';
 
+//Button component
 import Button from 'components/Button';
+
+//Days of the week component
 import DayListItem from 'components/DayListItem';
 import DayList from 'components/DayList.js';
+
+//Interviewer component
 import InterviewerListItem from 'components/InterviewerListItem';
 import InterviewerList from 'components/InterviewerList';
 
+//Appointment component
+import Appointment from 'components/Appointment/index.js';
+import Header from 'components/Appointment/Header.js';
+import Empty from 'components/Appointment/Empty.js';
+
+//Button stories
 storiesOf('Button', module)
 	.addParameters({
 		backgrounds: [{ name: 'dark', value: '#222f3e', default: true }],
@@ -27,6 +38,7 @@ storiesOf('Button', module)
 		</Button>
 	));
 
+//Days of the week stories
 storiesOf('DayListItem', module)
 	.addParameters({
 		backgrounds: [{ name: 'dark', value: '#222f3e', default: true }],
@@ -37,7 +49,6 @@ storiesOf('DayListItem', module)
 	.add('Clickable', () => (
 		<DayListItem name='Tuesday' setDay={action('setDay')} spots={5} />
 	));
-
 const days = [
 	{
 		id: 1,
@@ -55,7 +66,6 @@ const days = [
 		spots: 0,
 	},
 ];
-
 storiesOf('DayList', module)
 	.addParameters({
 		backgrounds: [{ name: 'dark', value: '#222f3e', default: true }],
@@ -67,12 +77,12 @@ storiesOf('DayList', module)
 		<DayList days={days} day={'Tuesday'} setDay={action('setDay')} />
 	));
 
+//Interviewer stories
 const interviewer = {
 	id: 1,
 	name: 'Sylvia Palmer',
 	avatar: 'https://i.imgur.com/LpaY82x.png',
 };
-
 storiesOf('InterviewerListItem', module)
 	.addParameters({
 		backgrounds: [{ name: 'dark', value: '#222f3e', default: true }],
@@ -100,7 +110,6 @@ storiesOf('InterviewerListItem', module)
 			setInterviewer={(event) => action('setInterviewer')(interviewer.id)}
 		/>
 	));
-
 const interviewers = [
 	{ id: 1, name: 'Sylvia Palmer', avatar: 'https://i.imgur.com/LpaY82x.png' },
 	{ id: 2, name: 'Tori Malcolm', avatar: 'https://i.imgur.com/Nmx0Qxo.png' },
@@ -108,7 +117,6 @@ const interviewers = [
 	{ id: 4, name: 'Cohana Roy', avatar: 'https://i.imgur.com/FK8V841.jpg' },
 	{ id: 5, name: 'Sven Jones', avatar: 'https://i.imgur.com/twYrpay.jpg' },
 ];
-
 storiesOf('InterviewerList', module)
 	.addParameters({
 		backgrounds: [{ name: 'dark', value: '#222f3e', default: true }],
@@ -126,3 +134,16 @@ storiesOf('InterviewerList', module)
 			setInterviewer={action('setInterviewer')}
 		/>
 	));
+
+//Appointment stories
+storiesOf('Appointment', module)
+	.addParameters({
+		backgrounds: [{ name: 'white', value: '#fff', default: true }],
+	})
+	.add('Appointment', () => <Appointment />)
+	.add('Appointment with Time', () => <Appointment time={'12pm'} />)
+
+	//Header stories
+	.add('Header', () => <Header />)
+	.add('Header with Time', () => <Header time={'12pm'} />)
+	.add('Empty', () => <Empty onAdd={action('onAdd')} />);
