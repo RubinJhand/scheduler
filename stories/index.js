@@ -24,6 +24,7 @@ import Show from 'components/Appointment/Show.js';
 import Confirm from 'components/Appointment/Confirm.js';
 import Status from 'components/Appointment/Status.js';
 import Error from 'components/Appointment/Error.js';
+import Form from 'components/Appointment/Form.js';
 
 //Button stories
 storiesOf('Button', module)
@@ -165,9 +166,31 @@ storiesOf('Appointment', module)
 	))
 	.add('Saving', () => <Status message={'Saving'} />)
 	.add('Status', () => <Status message={'Deleting'} />)
-	.add('Error', () => (
+	.add('Error Saving', () => (
+		<Error
+			message={'Could not save appointment.'}
+			onClose={action('onClose')}
+		/>
+	))
+	.add('Error Deleting', () => (
 		<Error
 			message={'Could not delete appointment.'}
 			onClose={action('onClose')}
+		/>
+	))
+	.add('Edit Form', () => (
+		<Form
+			name={'Chunk'}
+			interviewers={interviewers}
+			interviewer={3}
+			onSave={action('onSave')}
+			onCancel={action('onCancel')}
+		/>
+	))
+	.add('Create Form', () => (
+		<Form
+			interviewers={interviewers}
+			onSave={action('onSave')}
+			onCancel={action('onCancel')}
 		/>
 	));
