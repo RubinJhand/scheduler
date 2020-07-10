@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Fragment } from 'react';
 import axios from 'axios';
 
 import 'components/Application.scss';
@@ -19,20 +19,34 @@ export default function Application(props) {
     appointments: {},
     interviewers: {}
   });
-
   const setDay = (day) => setState({ ...state, day });
   const appointments = getAppointmentsForDay(state, state.day);
-  const interviewers = getInterviewersForDay(state, state.day);
+
+  function bookInterview(id, interview) {
+    const appointment = {
+      ...state.appointments[id],
+      interview: { ...interview }
+    };
+    const appointments = {
+      ...state.appointments,
+      [id]: appointment
+    };
+    return axios
+      .put(`/api/appointments/${id}`, appointment)
+      .then((response) => {
+        if (response.status === 204) setState({ ...state, appointments });
+      });
+  }
 
   const schedule = appointments.map((appointment) => {
-    const interview = getInterview(state, appointment.interview);
     return (
       <Appointment
         key={appointment.id}
         id={appointment.id}
         time={appointment.time}
-        interview={interview}
-        interviewers={interviewers}
+        interview={getInterview(state, appointment.interview)}
+        interviewers={getInterviewersForDay(state, state.day)}
+        bookInterview={bookInterview}
       />
     );
   });
@@ -42,15 +56,18 @@ export default function Application(props) {
     const appointmentsPromise = axios.get('/api/appointments');
     const interviewersPromise = axios.get('/api/interviewers');
 
-    Promise.all([daysPromise, appointmentsPromise, interviewersPromise])
-      .then((response) => {
-        setState((prev) => ({
-          ...prev,
-          days: response[0].data,
-          appointments: response[1].data,
-          interviewers: response[2].data
-        }));
-      });
+    Promise.all([
+      daysPromise,
+      appointmentsPromise,
+      interviewersPromise
+    ]).then((response) => {
+      setState((prev) => ({
+        ...prev,
+        days: response[0].data,
+        appointments: response[1].data,
+        interviewers: response[2].data
+      }));
+    });
   }, []);
 
   return (
@@ -63,11 +80,7 @@ export default function Application(props) {
         />
         <hr className='sidebar__separator sidebar--centered' />
         <nav className='sidebar__menu'>
-          <DayList
-            days={state.days}
-            day={state.day}
-            setDay={setDay}
-          />
+          <DayList days={state.days} day={state.day} setDay={setDay} />
         </nav>
         <img
           className='sidebar__lhl sidebar--centered'
@@ -76,8 +89,10 @@ export default function Application(props) {
         />
       </section>
       <section className='schedule'>
-        {schedule}
-        <Appointment key={'last'} time={'5pm'} />
+        <Fragment>
+          {schedule}
+          <Appointment key={'last'} time={'5pm'} />
+        </Fragment>
       </section>
     </main>
   );
