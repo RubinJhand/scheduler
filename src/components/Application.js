@@ -8,7 +8,8 @@ import Appointment from './Appointment/index';
 
 import {
   getAppointmentsForDay,
-  getInterview
+  getInterview,
+  getInterviewersForDay
 } from 'helpers/selectors';
 
 export default function Application(props) {
@@ -21,6 +22,8 @@ export default function Application(props) {
 
   const setDay = (day) => setState({ ...state, day });
   const appointments = getAppointmentsForDay(state, state.day);
+  const interviewers = getInterviewersForDay(state, state.day);
+
   const schedule = appointments.map((appointment) => {
     const interview = getInterview(state, appointment.interview);
     return (
@@ -29,6 +32,7 @@ export default function Application(props) {
         id={appointment.id}
         time={appointment.time}
         interview={interview}
+        interviewers={interviewers}
       />
     );
   });
@@ -37,18 +41,16 @@ export default function Application(props) {
     const daysPromise = axios.get('/api/days');
     const appointmentsPromise = axios.get('/api/appointments');
     const interviewersPromise = axios.get('/api/interviewers');
-    Promise.all([
-      daysPromise,
-      appointmentsPromise,
-      interviewersPromise
-    ]).then((response) => {
-      setState((prev) => ({
-        ...prev,
-        days: response[0].data,
-        appointments: response[1].data,
-        interviewers: response[2].data
-      }));
-    });
+
+    Promise.all([daysPromise, appointmentsPromise, interviewersPromise])
+      .then((response) => {
+        setState((prev) => ({
+          ...prev,
+          days: response[0].data,
+          appointments: response[1].data,
+          interviewers: response[2].data
+        }));
+      });
   }, []);
 
   return (
