@@ -31,7 +31,7 @@ export default function Appointment(props) {
     props
       .bookInterview(props.id, interview)
       .then(() => transition(SHOW))
-      .catch((error) => transition(ERROR_SAVE, true));
+      .catch((error) => transition(ERROR_SAVE));
   };
 
   const cancel = () => {
@@ -39,14 +39,14 @@ export default function Appointment(props) {
     props
       .cancelInterview(props.id)
       .then(() => transition(EMPTY))
-      .catch(() => transition(ERROR_DELETE, true));
+      .catch((error) => transition(ERROR_DELETE, true));
   };
 
   return (
     <article className='appointment' data-testid='appointment'>
       <Header time={time} />
       {mode === EMPTY && <Empty onAdd={() => transition(CREATE)} />}
-      {mode === SHOW && (
+      {mode === SHOW && interview && (
         <Show
           student={interview.student}
           interviewer={interview.interviewer}
@@ -57,20 +57,12 @@ export default function Appointment(props) {
         />
       )}
       {mode === CREATE && (
-        <Form
-          interviewers={interviewers}
-          onCancel={() => back()}
-          onSave={save}
-        />
+        <Form interviewers={interviewers} onCancel={back} onSave={save} />
       )}
       {mode === SAVING && <Status message='Saving' />}
       {mode === DELETING && <Status message='Deleting' />}
       {mode === CONFIRM && (
-        <Confirm
-          message={'Confirm'}
-          onConfirm={() => cancel()}
-          onCancel={back}
-        />
+        <Confirm message={'Confirm'} onConfirm={cancel} onCancel={back} />
       )}
       {mode === EDIT && (
         <Form
@@ -82,10 +74,10 @@ export default function Appointment(props) {
         />
       )}
       {mode === ERROR_DELETE && (
-        <Error message='Error deleting appointment' onClose={() => back()} />
+        <Error message='Error deleting appointment' onClose={back} />
       )}
       {mode === ERROR_SAVE && (
-        <Error message='Error saving appointment' onClose={() => back()} />
+        <Error message='Error saving appointment' onClose={back} />
       )}
     </article>
   );
