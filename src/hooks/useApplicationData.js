@@ -65,7 +65,20 @@ export default function useApplicationData() {
       });
   };
 
-  const cancelInterview = (id) => {
+  // const spots = (id) => {
+  //   const appointment = { ...state.appointments[id], interview: null };
+  //   const appointments = { ...state.appointments, [id]: appointment };
+
+  //   const days = state.days.map((item) => {
+  //     if (item.appointments.includes(id)) {
+  //       return {
+  //         ...(item ? item.spots - 1 : item.spots + 1)
+  //       };
+  //     } else return item;
+  //   });
+  // };
+
+  const cancelInterview = (id, day) => {
     const appointment = { ...state.appointments[id], interview: null };
     const appointments = { ...state.appointments, [id]: appointment };
 
@@ -101,7 +114,7 @@ export default function useApplicationData() {
           interviewers
         });
       })
-      .catch((err) => console.log(err));
+      .catch((error) => console.log(error));
   }, []);
 
   return {
