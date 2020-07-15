@@ -10,17 +10,43 @@ function reducer(state, action) {
     case SET_DAY:
       return { ...state, day: action.value };
     case SET_APPLICATION_DATA:
+      const { days, appointments, interviewers } = action;
       return {
         ...state,
-        days: action.days,
-        appointments: action.appointments,
-        interviewers: action.interviewers
+        days,
+        appointments,
+        interviewers
       };
     case SET_INTERVIEW: {
-      return { ...state, days: action.days, appointments: action.appointments };
+      const id = action.value.id;
+      const interview = action.value.interview;
+      const appointment = {
+        ...state.appointments[id],
+        interview: interview ? { ...interview } : null
+      };
+      const appointments = { ...state.appointments, [id]: appointment };
+
+      const spotsRemaining = (day) => {
+        return !state.appointments[id].interview
+          ? day.spots - 1
+          : !interview
+          ? day.spots + 1
+          : day.spots;
+      };
+
+      const days = state.days.map((item) => {
+        return item.appointments.includes(id)
+          ? {
+              ...item,
+              spots: spotsRemaining(item)
+            }
+          : item;
+      });
+
+      return { ...state, days, appointments };
     }
     default:
-      throw new Error(`: ${action.type}`);
+      throw new Error(`Unsupported action type: ${action.type}`);
   }
 }
 
@@ -35,63 +61,22 @@ export default function useApplicationData() {
   const setDay = (day) => dispatch({ type: SET_DAY, value: day });
 
   const bookInterview = (id, interview) => {
-    const appointment = {
-      ...state.appointments[id],
-      interview: { ...interview }
-    };
-    const appointments = { ...state.appointments, [id]: appointment };
-
-    let { days } = state;
-
-    if (!state.appointments[id].interview) {
-      days = state.days.map((item) => {
-        if (item.appointments.includes(id)) {
-          item.spots = item.spots - 1;
-          return item;
-        } else return item;
-      });
-    }
-
     return axios
       .put(`/api/appointments/${id}`, { interview })
       .then((response) => {
         if (response.status === 204) {
           dispatch({
             type: SET_INTERVIEW,
-            appointments: appointments,
-            days: days
+            value: { id, interview }
           });
         }
       });
   };
 
-  // const spots = (id) => {
-  //   const appointment = { ...state.appointments[id], interview: null };
-  //   const appointments = { ...state.appointments, [id]: appointment };
-
-  //   const days = state.days.map((item) => {
-  //     if (item.appointments.includes(id)) {
-  //       return {
-  //         ...(item ? item.spots - 1 : item.spots + 1)
-  //       };
-  //     } else return item;
-  //   });
-  // };
-
-  const cancelInterview = (id, day) => {
-    const appointment = { ...state.appointments[id], interview: null };
-    const appointments = { ...state.appointments, [id]: appointment };
-
-    const days = state.days.map((item) => {
-      if (item.appointments.includes(id)) {
-        item.spots = item.spots + 1;
-        return item;
-      } else return item;
-    });
-
+  const cancelInterview = (id) => {
     return axios.delete(`/api/appointments/${id}`).then((response) => {
       if (response.status === 204) {
-        dispatch({ type: SET_INTERVIEW, days, appointments });
+        dispatch({ type: SET_INTERVIEW, value: { id, interview: null } });
       }
     });
   };
@@ -101,8 +86,8 @@ export default function useApplicationData() {
     const appointmentsPromise = axios.get('/api/appointments');
     const interviewersPromise = axios.get('/api/interviewers');
 
-    Promise.all([daysPromise, appointmentsPromise, interviewersPromise])
-      .then((response) => {
+    Promise.all([daysPromise, appointmentsPromise, interviewersPromise]).then(
+      (response) => {
         const days = response[0].data;
         const appointments = response[1].data;
         const interviewers = response[2].data;
@@ -113,8 +98,8 @@ export default function useApplicationData() {
           appointments,
           interviewers
         });
-      })
-      .catch((error) => console.log(error));
+      }
+    );
   }, []);
 
   return {
