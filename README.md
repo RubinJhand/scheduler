@@ -33,6 +33,7 @@ Interview Scheduler is a dynamic single page React application that allows users
 ## Setup
 
 Install dependencies with `npm install`.
+Fork, clone, and install [scheduler-api](https://github.com/lighthouse-labs/scheduler-api). Setup and run database.
 
 ## Running Webpack Development Server
 
@@ -50,6 +51,12 @@ npm test
 
 ```sh
 npm run storybook
+```
+
+## Running Cypress
+
+```sh
+npm run cypress
 ```
 
 ## Stack
