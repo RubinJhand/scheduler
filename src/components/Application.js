@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 
 import 'components/Application.scss';
 
@@ -21,7 +21,7 @@ export default function Application(props) {
   } = useApplicationData();
 
   const appointments = getAppointmentsForDay(state, state.day);
-
+  //Create daily schedule with appointments from database
   const schedule = appointments.map((appointment) => {
     return (
       <Appointment
@@ -55,10 +55,8 @@ export default function Application(props) {
         />
       </section>
       <section className='schedule'>
-        <Fragment>
-          {schedule}
-          <Appointment key={'last'} time={'5pm'} />
-        </Fragment>
+        {schedule}
+        <Appointment key={'last'} time={'5pm'} />
       </section>
     </main>
   );

@@ -12,6 +12,7 @@ import Form from 'components/Appointment/Form';
 import useVisualMode from 'hooks/useVisualMode';
 
 export default function Appointment(props) {
+  //Visual state 'mode' for useVisualMode hook.
   const EMPTY = 'EMPTY';
   const SHOW = 'SHOW';
   const CREATE = 'CREATE';
@@ -27,11 +28,14 @@ export default function Appointment(props) {
 
   const save = (name, interviewer) => {
     transition(SAVING);
-    const interview = { student: name, interviewer };
+    const interview = {
+      student: name,
+      interviewer
+    };
     props
       .bookInterview(props.id, interview)
       .then(() => transition(SHOW))
-      .catch((error) => transition(ERROR_SAVE));
+      .catch((error) => transition(ERROR_SAVE, true));
   };
 
   const cancel = () => {
